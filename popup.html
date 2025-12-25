@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SpoilFree</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="popup-container">
+    <div class="header">
+      <div class="logo">
+        <img src="icon128.png" alt="SpoilFree logo">
+      </div>
+
+      <h1>SpoilFree</h1>
+      <p class="tagline">Browse without spoilers</p>
+    </div>
+
+    <div class="toggle-row">
+      <span>Status</span>
+      <label class="switch">
+        <input type="checkbox" id="toggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="counter">
+      <span class="count" id="spoilerCount">0</span>
+      <span class="label">Spoilers hidden</span>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
