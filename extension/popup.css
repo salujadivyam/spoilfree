@@ -1,0 +1,115 @@
+* {
+  box-sizing: border-box;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  width: 260px;
+  height: 260px;
+  background: linear-gradient(
+    135deg,
+    #d95b62 0%,
+    #b9474d 100%
+  );
+  color: white;
+}
+
+.popup-container {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.tagline {
+  margin: 4px 0 0;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.toggle-row {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+/* Toggle switch */
+.switch {
+  position: relative;
+  width: 42px;
+  height: 22px;
+}
+
+.switch input {
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  background: #222;
+  border-radius: 22px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.slider::before {
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  top: 2px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+input:checked + .slider {
+  background: white;
+}
+
+input:checked + .slider::before {
+  transform: translateX(20px);
+  background: #d95b62;
+}
+
+.counter {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 14px;
+  padding: 18px;
+  text-align: center;
+}
+
+.count {
+  font-size: 32px;
+  font-weight: 800;
+  display: block;
+}
+
+.label {
+  font-size: 12px;
+  opacity: 0.85;
+}
+.logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.logo img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
