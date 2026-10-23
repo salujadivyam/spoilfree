@@ -5,21 +5,22 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
-from transformers import DistilBertTokenizerFast, DistilBertForSequenceClassification
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 MODEL_PATH = "./spoilfree_model"
-THRESHOLD = float(os.environ.get("THRESHOLD", 0.5))   
+THRESHOLD = float(os.environ.get("THRESHOLD", 0.5))   # extension applies the real bars
+MAX_LEN = int(os.environ.get("MAX_LEN", 160))         # same as training (MAXLEN in the notebook)
 
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["GET", "POST"], allow_headers=["Content-Type"], allow_credentials=False)
 
-tokenizer = DistilBertTokenizerFast.from_pretrained(MODEL_PATH)
-model = DistilBertForSequenceClassification.from_pretrained(MODEL_PATH)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)          # works for DistilBERT and RoBERTa
+model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH)
 model.eval()
 
 
 class TextInput(BaseModel):
-    text: str = Field(max_length=5000)    #bigger bodies will get 422 nothing is processed
+    text: str = Field(max_length=5000)     # bigger bodies get a 422 nothing is processed
 
 
 # simple per-IP rate limit in memory as HF puts the real client IP in x-forwarded-for.
@@ -45,7 +46,7 @@ def predict(input: TextInput):
     text = input.text.strip()[:2000]
     if len(text) < 20:
         return {"spoiler": False, "confidence": 0.0, "series_name": None}
-    x = tokenizer(text, return_tensors="pt", truncation=True, max_length=256)
+    x = tokenizer(text, return_tensors="pt", truncation=True, max_length=MAX_LEN)
     with torch.no_grad():
         p = F.softmax(model(**x).logits, dim=1)[0, 1].item()   # probability of class 1 = spoiler
     return {"spoiler": p >= THRESHOLD, "confidence": round(p, 4), "series_name": None}
