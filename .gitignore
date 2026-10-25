@@ -218,3 +218,14 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+ml/data/raw/
+ml/data/processed/
+ml/data/eval/eval_real.csv
+spoilfree_model/
+model_v1/
+*.safetensors
+*.bin
+*.zip
+.env
+__pycache__/
