@@ -134,7 +134,7 @@ class TVMazeFetcher {
     const episodes = await this.getShowEpisodes(showId);
 
     return {
-      name: searchResult.name,
+      name: typeof searchResult.name==="string" ? searchResult.name.slice(0,100) : seriesName,   // trust nothing from outside
       tvmazeId: showId,
       characters: cast.slice(0, 50),
       episodes: episodes.slice(0, 100), 
