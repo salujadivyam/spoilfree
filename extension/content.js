@@ -3,7 +3,7 @@ const BLUR_CLASS="spoilfree-blur"
 const max_parallel=4, max_per_page=150
 let enabled=false, strict=false, series=[], seen=new WeakMap()
 let gen=0, active=0, sent=0, pending=0, scan_timer, count_timer
-const cache=new Map(), queue=[]
+const cache=new Map(), queue=[], wired=new WeakSet()
 
 chrome.storage.local.get({enabled:true, strict:false}, d => {
   enabled=d.enabled; strict=d.strict
@@ -103,11 +103,14 @@ function shouldBlur(r, job) {
 
 function blur(el, name) {
   el.classList.add(BLUR_CLASS)
-  el.title="Spoiler for "+name+". Click to show."
-  el.addEventListener("click", e => {
+  el.title="Spoiler for "+name+". Click to show or hide."
+  if (!wired.has(el)) { wired.add(el); el.addEventListener("click", e => {
+    if (!el.dataset.sf) return   // no longer ours
+    if (!el.classList.contains(BLUR_CLASS) && e.target.closest("a")) return   // revealed text keeps working links
     e.preventDefault(); e.stopPropagation()
-    el.classList.remove(BLUR_CLASS)
-  }, {capture:true, once:true})
+    el.classList.toggle(BLUR_CLASS)
+  }, {capture:true}) }   // wire once, flag decides if it acts
+  el.dataset.sf="1"
   pending++
   clearTimeout(count_timer)
   count_timer=setTimeout(() => {
@@ -118,7 +121,7 @@ function blur(el, name) {
 
 function unblurAll() {
   gen++; queue.length=0
-  document.querySelectorAll("."+BLUR_CLASS).forEach(e => e.classList.remove(BLUR_CLASS))
+  document.querySelectorAll("[data-sf]").forEach(e => { e.classList.remove(BLUR_CLASS); delete e.dataset.sf })
 }
 
 chrome.storage.onChanged.addListener(ch => {
