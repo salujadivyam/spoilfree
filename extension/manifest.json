@@ -29,7 +29,13 @@
         "https://outlook.live.com/*",
         "https://outlook.office.com/*",
         "https://web.whatsapp.com/*",
-        "https://*.paypal.com/*"
+        "https://*.paypal.com/*",
+        "https://docs.google.com/*",
+      "https://drive.google.com/*",
+          "https://*.notion.so/*",
+          "https://app.slack.com/*",
+          "https://discord.com/*",
+          "https://web.telegram.org/*"
       ],
       "match_about_blank": false
     }
