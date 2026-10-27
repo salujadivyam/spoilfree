@@ -92,3 +92,4 @@ input[type=checkbox].box-chk:focus-visible,.strict input:focus-visible,.fin:focu
 
 .strict{display:flex;align-items:center;gap:8px;padding:6px 8px;font-size:12px;border-top:3px solid var(--ink);cursor:pointer}
 .strict:hover{background:#ecd9c6}
+
