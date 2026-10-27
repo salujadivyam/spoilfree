@@ -15,7 +15,7 @@ class TVMazeFetcher {
       const response = await this.fetchWithTimeout(url, this.TIMEOUT);
       const data = await response.json();
 
-      if (data && data.length > 0) {
+      if (Array.isArray(data) && data.length > 0 && data[0].show) {
         return data[0].show; //returns the best match
       }
       return null;
@@ -31,18 +31,19 @@ class TVMazeFetcher {
     @returns {Promise<Array>} - array of character/actor names
    */
   static async getShowCast(showId) {
+    if (!Number.isInteger(showId)) return []; //id goes into the url, numbers only
     try {
       const url = `${this.BASE_URL}/shows/${showId}/cast`;
       const response = await this.fetchWithTimeout(url, this.TIMEOUT);
       const data = await response.json();
 
-      if (data) {
+      if (Array.isArray(data)) {
         //extracts both character names and actor names
         const names = [];
         
         data.forEach((entry) => {
-          if (entry.character && entry.character.name) {
-            names.push(entry.character.name.toLowerCase());
+          if (entry.character && typeof entry.character.name === "string") {
+            names.push(entry.character.name.toLowerCase().slice(0, 60));
           }
         });
 
@@ -61,17 +62,18 @@ class TVMazeFetcher {
    @returns {Promise<Array>} - episode titles and keywords
    */
   static async getShowEpisodes(showId) {
+    if (!Number.isInteger(showId)) return [];
     try {
       const url = `${this.BASE_URL}/shows/${showId}/episodes`;
       const response = await this.fetchWithTimeout(url, this.TIMEOUT);
       const data = await response.json();
 
-      if (data) {
+      if (Array.isArray(data)) {
         const episodes = [];
         
         data.forEach((ep) => {
-          if (ep.name) {
-            episodes.push(ep.name.toLowerCase());
+          if (typeof ep.name === "string") {
+            episodes.push(ep.name.toLowerCase().slice(0, 100));
           }
         });
 
@@ -125,6 +127,9 @@ class TVMazeFetcher {
     }
 
     const showId = searchResult.id;
+    if (!Number.isInteger(showId)) {
+      return { name: seriesName, characters: [], episodes: [], fetchedAt: new Date().toISOString(), found: false };
+    }
     const cast = await this.getShowCast(showId);
     const episodes = await this.getShowEpisodes(showId);
 
@@ -143,12 +148,15 @@ class TVMazeFetcher {
     @param {string} url - URL to fetch
     @param {number} timeout - timeout in ms
    */
-  static fetchWithTimeout(url, timeout) {
-    return Promise.race([
-      fetch(url),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("TVMaze fetch timeout")), timeout)
-      ),
-    ]);
+  static async fetchWithTimeout(url, timeout) {
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), timeout);
+    try {
+      const response = await fetch(url, { signal: ctl.signal, credentials: "omit" });
+      if (!response.ok) throw new Error(`TVMaze ${response.status}`); //429, 404, 5xx are not data
+      return response;
+    } finally {
+      clearTimeout(timer);
+    }
   }
 }
