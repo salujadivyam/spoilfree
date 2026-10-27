@@ -1,35 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>SpoilFree</title>
-  <link rel="stylesheet" href="popup.css" />
+<meta charset="UTF-8">
+<title>SpoilFree</title>
+<link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <div class="popup-container">
-    <div class="header">
-      <div class="logo">
-        <img src="icon128.png" alt="SpoilFree logo">
-      </div>
+<main class="app">
+  <header class="top" id="top">
+    <img class="logo" src="icons/logo.png" alt="SpoilFree">
+    <div class="count"><b id="count">0</b><span>hidden</span></div>
+    <label class="switch" title="Turn SpoilFree on or off">
+      <input type="checkbox" id="enabled">
+      <span class="track"><span class="state" id="state">ON</span><span class="knob"></span></span>
+    </label>
+  </header>
 
-      <h1>SpoilFree</h1>
-      <p class="tagline">Browse without spoilers</p>
-    </div>
-
-    <div class="toggle-row">
-      <span>Status</span>
-      <label class="switch">
-        <input type="checkbox" id="toggle">
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <div class="counter">
-      <span class="count" id="spoilerCount">0</span>
-      <span class="label">Spoilers hidden</span>
-    </div>
-  </div>
-
-  <script src="popup.js"></script>
+  <section class="box">
+    <div class="bar"><h2>Watchlist</h2><span id="num">0 shows</span></div>
+    <form class="add" id="add">
+      <input type="text" id="name" placeholder="Add a series or movie" maxlength="80" autocomplete="off">
+      <button type="submit" id="addbtn">Add</button>
+    </form>
+    <ul id="list"></ul>
+    <label class="strict">
+      <input type="checkbox" id="strict">
+      <span>Strict: also hide spoilers that name no episode</span>
+    </label>
+  </section>
+</main>
+<script src="tvmaze-fetcher.js"></script>
+<script src="watchlist-manager.js"></script>
+<script src="popup.js"></script>
 </body>
 </html>
