@@ -3,6 +3,7 @@
 
 class WatchlistManager {
   static STORAGE_KEY = "spoilfree_watchlist";
+  static GENERIC = new Set(["narrator", "mother", "father", "brother", "sister", "mommy", "daddy", "doctor", "officer", "waiter", "waitress", "nurse", "sheriff", "teacher", "captain", "president", "agent", "guard", "bartender", "stranger", "himself", "herself", "young", "older", "future", "woman", "girl", "boys", "girls", "man", "male", "female", "detective", "judge", "priest", "cashier", "driver", "soldier", "reporter", "student", "manager", "customer", "voice", "host", "kids", "child", "children", "lady", "gentleman", "clerk", "bouncer", "neighbor", "receptionist", "cop", "mayor", "senator", "general", "boss", "wife", "husband"]);   // character words that are plain english
   static TVMAZE_DATA_KEY = "spoilfree_tvmaze_data"; //stores TVMaze data
 
   static async init() {
@@ -44,6 +45,9 @@ class WatchlistManager {
       title: seriesName.trim(),
       tvmazeId: tvmazeData.tvmazeId || null, //version1.1: store for show_id matching
       active: true,
+      done: false,
+      progress: { s: 0, e: 0 },
+      movie: !tvmazeData.tvmazeId,   // no tvmaze match, so a movie
       addedAt: new Date().toISOString(),
     };
 
@@ -116,16 +120,47 @@ class WatchlistManager {
     return false;
   }
 
-  // get only active series titles
-   
+  // progress, finished tick, any field patch
+  static async setProgress(id, s, e) { return this._patch(id, { progress: { s, e } }); }
+  static async setDone(id, done) { return this._patch(id, { done }); }
+  static async _patch(id, fields) {
+    const watchlist = await this.getWatchlist();
+    const item = watchlist.find((i) => i.id === id);
+    if (!item) return false;
+    Object.assign(item, fields);
+    return new Promise((resolve) => {
+      chrome.storage.local.set({ [this.STORAGE_KEY]: watchlist }, () => resolve(true));
+    });
+  }
+
+  // active, unfinished series with match terms
   static async getActiveSeries() {
     const watchlist = await this.getWatchlist();
+    const store = await this.getTVMazeData();
     return watchlist
-      .filter((item) => item.active)
-      .map((item) => ({
-        title: item.title.toLowerCase(),
-        tvmazeId: item.tvmazeId || null  // Version1.1: expose for show_id matching
-      }));
+      .filter((item) => item.active && !item.done)
+      .map((item) => {
+        const d = store[item.title.toLowerCase()] || {};
+        const terms = [item.title, d.name].filter(Boolean);
+        if (!item.movie) {   // movie: tvmaze guess is a different show, skip its characters
+          for (const c of d.characters || []) {
+            const n = c.toLowerCase().trim();
+            if (n.includes(" ")) terms.push(n);   // full name
+            for (const part of n.split(/\s+/)) {
+              if (part.length >= 5 && !WatchlistManager.GENERIC.has(part)) terms.push(part);   // short or generic words match other texts
+            }
+          }
+        }
+        return {
+          id: item.id,
+          title: item.title,
+          tvmazeId: item.tvmazeId || null,
+          terms: [...new Set(terms.map((t) => t.toLowerCase()))],
+          progress: item.progress || { s: 0, e: 0 },
+          movie: !!item.movie,
+          done: false,
+        };
+      });
   }
 
   //get TVMaze data for all series
