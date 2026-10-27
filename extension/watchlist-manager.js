@@ -123,6 +123,8 @@ class WatchlistManager {
   // progress, finished tick, any field patch
   static async setProgress(id, s, e) { return this._patch(id, { progress: { s, e } }); }
   static async setDone(id, done) { return this._patch(id, { done }); }
+  static async setActive(id, active) { return this._patch(id, { active }); }
+  static async setMovie(id, movie) { return this._patch(id, { movie }); }
   static async _patch(id, fields) {
     const watchlist = await this.getWatchlist();
     const item = watchlist.find((i) => i.id === id);
