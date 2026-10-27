@@ -2,7 +2,7 @@ const API_URL="https://salujadivyam-spoilfree.hf.space/predict"
 const BLUR_CLASS="spoilfree-blur"
 const max_parallel=4, max_per_page=150
 let enabled=false, strict=false, series=[], seen=new WeakMap()
-let active=0, sent=0, pending=0, scan_timer, count_timer
+let gen=0, active=0, sent=0, pending=0, scan_timer, count_timer
 const cache=new Map(), queue=[]
 
 chrome.storage.local.get({enabled:true, strict:false}, d => {
@@ -11,17 +11,35 @@ chrome.storage.local.get({enabled:true, strict:false}, d => {
 })
 
 async function start() {
+  gen++; queue.length=0   // drop jobs made under the old watchlist
   series=SeriesMatcher.compile(await WatchlistManager.getActiveSeries())
   seen=new WeakMap()
   scan()
 }
 
+const on_google=/(^|\.)google\./.test(location.hostname)   // ai overview has no p/li, classes change often
+
 function candidates() {
-  return [...document.querySelectorAll("p, li, h1, h2, h3, div[data-click-id='text'], div[data-testid='comment']")]
-    .filter(el => el.innerText && el.innerText.length>40 && el.innerText.length<500
-      && !el.closest("nav") && !el.closest("header")
-      && !el.closest("."+BLUR_CLASS)
-      && !el.querySelector("p, li, h1, h2, h3"))   // leaf only
+  const skip="script, style, noscript, textarea, input, svg, form, nav, header, [role='listbox']"
+  let found
+  if (on_google) {
+    const out=new Set()
+    for (const e of document.body.querySelectorAll("*")) {
+      if (e.matches(skip)) continue
+      const n=e.textContent.length
+      if (n<40 || n>500) continue
+      if ([...e.children].some(c => c.textContent.length>=40)) continue   // smallest element holding the text
+      let b=e
+      while (b.parentElement && getComputedStyle(b).display.startsWith("inline")) b=b.parentElement   // climb out of span, a, b
+      out.add(b)
+    }
+    found=[...out]
+  } else {
+    found=[...document.querySelectorAll("p, li, h1, h2, h3, div[data-click-id='text'], div[data-testid='comment']")]
+      .filter(el => !el.querySelector("p, li, h1, h2, h3"))   // leaf only
+  }
+  return found.filter(el => el.innerText && el.innerText.length>40 && el.innerText.length<500
+    && !el.closest("nav, header, ."+BLUR_CLASS))
 }
 
 function scan() {
@@ -34,7 +52,7 @@ function scan() {
     if (/\bno spoilers?\b|spoiler[- ]free/i.test(text)) continue
     let shows=SeriesMatcher.findMentions(text, series), via=false
     if (!shows.length && ctx.length) { shows=ctx; via=true }
-    if (shows.length) queue.push({el, text, shows, via, ctx:ctx.length>0})
+    if (shows.length) queue.push({el, text, shows, via, ctx:ctx.length>0, gen})
   }
   pump()
 }
@@ -60,7 +78,9 @@ async function predict(text) {
 }
 
 async function classify(job) {
+  if (job.gen!==gen) return
   const r=await predict(job.text)
+  if (job.gen!==gen) return   // watchlist changed while waiting
   const name=shouldBlur(r, job)
   if (name && enabled && job.el.isConnected) blur(job.el, name)
 }
@@ -97,6 +117,7 @@ function blur(el, name) {
 }
 
 function unblurAll() {
+  gen++; queue.length=0
   document.querySelectorAll("."+BLUR_CLASS).forEach(e => e.classList.remove(BLUR_CLASS))
 }
 
