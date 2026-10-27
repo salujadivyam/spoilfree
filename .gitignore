@@ -228,4 +228,5 @@ model_v1/
 *.bin
 *.zip
 .env
+*.ini
 __pycache__/
