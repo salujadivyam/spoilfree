@@ -28,17 +28,15 @@ class WatchlistManager {
    */
   static async addSeries(seriesName) {
     if (!seriesName || seriesName.trim().length === 0) return false;
-
-    const watchlist = await this.getWatchlist();
     const normalized = seriesName.trim().toLowerCase();
+    const canAdd = (list) => list.length < 100 && !list.some((item) => item.title.toLowerCase() === normalized);
 
-    if (watchlist.some((item) => item.title.toLowerCase() === normalized)) {
-      return false;
-    }
+    if (!canAdd(await this.getWatchlist())) return false;   // cheap check before the network call
 
-    // fetches TVMaze data for this series first to get the ID
-    console.log(`Fetching TVMaze data for ${seriesName}...`);
     const tvmazeData = await TVMazeFetcher.getShowData(seriesName);
+
+    const watchlist = await this.getWatchlist();   // read again, user may have edited during the fetch
+    if (!canAdd(watchlist)) return false;
 
     const newItem = {
       id: Date.now(),
