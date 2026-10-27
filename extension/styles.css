@@ -1,4 +1,2 @@
-.spoilfree-blur {
-    filter: blur(6px);
-    cursor: pointer;
-}
+.spoilfree-blur{filter:blur(6px) !important;cursor:pointer !important;user-select:none !important;-webkit-user-select:none !important}
+.spoilfree-blur:hover{filter:blur(4px) !important}
