@@ -87,7 +87,7 @@ spoilfree/
 2. Open `chrome://extensions` (or `brave://extensions`) and turn on Developer mode.
 3. Click **Load unpacked** and select the `extension` folder.
 
-The manifest includes a fixed `key`, so the extension keeps the same ID (`dkncpnkmklmdiageaibfgemfngclojnn`) from any folder or machine. That ID is the origin the server allows.
+The manifest includes a fixed `key`, so the extension keeps the same ID from any folder or machine. That ID is the origin the server allows.
 
 ## Privacy
 
