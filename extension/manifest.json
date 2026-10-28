@@ -1,5 +1,6 @@
 {
   "manifest_version": 3,
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4S+uuQ8zc8b3VjZBoHXPQoGxJzANWd5A8xe9zNweg0g3nVaZydYLMTEFNM1wkw0eGw+WVMG/ypnPClUypuw28DnrWGsc/UqkjDEw4nt36GbCRmvepZbBAqNMvf+LC84HhT2lqwnXo2xOk/LN+3b43exWP6GF9QKXrKW1ha/6fQ0Tgpla+05kxCVyEPogIcNBTjHtodv7yGyMDU/KdzH9/pKEXb+F3SfmoLsRYZ4wDIFI1DQddvbvfZlnIUdz2Ym5JAVwM+MLEqoYDF7cwbNFa6f8/CqIa79DDxAe5lyD2+cF2ujtIjZ/g04/O/P2ye0ndUQTR52/ia36jEC+XRfnMwIDAQAB",
   "name": "SpoilFree",
   "version": "1.2",
   "description": "Blurs potential spoiler content on web pages using an AI-powered detection API.",
@@ -31,11 +32,11 @@
         "https://web.whatsapp.com/*",
         "https://*.paypal.com/*",
         "https://docs.google.com/*",
-      "https://drive.google.com/*",
-          "https://*.notion.so/*",
-          "https://app.slack.com/*",
-          "https://discord.com/*",
-          "https://web.telegram.org/*"
+        "https://drive.google.com/*",
+        "https://*.notion.so/*",
+        "https://app.slack.com/*",
+        "https://discord.com/*",
+        "https://web.telegram.org/*"
       ],
       "match_about_blank": false
     }
