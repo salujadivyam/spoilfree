@@ -16,7 +16,7 @@ chrome.runtime.onMessage.addListener((msg,sender,reply)=>{
   if(msg?.type!=="predict"||typeof msg.text!=="string"||msg.text.length>2000){reply(null);return}
   allow().then(ok=>{
     if(!ok){reply({status:429});return}
-    const ctl=new AbortController(), t=setTimeout(()=>ctl.abort(),8000)
+    const ctl=new AbortController(), t=setTimeout(()=>ctl.abort(),15000)
     fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:msg.text}),signal:ctl.signal,credentials:"omit"})
       .then(r=>r.ok?r.json():{status:r.status})
       .then(reply)

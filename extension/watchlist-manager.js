@@ -168,7 +168,7 @@ class WatchlistManager {
   static async getTVMazeData() {
     return new Promise((resolve) => {
       chrome.storage.local.get({ [this.TVMAZE_DATA_KEY]: {} }, (data) => {
-        resolve(data[this.TVMAZE_DATA_KEY]);
+        resolve(Object.assign(Object.create(null), data[this.TVMAZE_DATA_KEY]));
       });
     });
   }
