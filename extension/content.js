@@ -1,5 +1,5 @@
 const BLUR_CLASS="spoilfree-blur"
-const debug=true   // true logs every decision to the console
+const debug=false   // true logs every decision to the console
 const max_parallel=4, max_per_window=150, window_ms=600000   // 150 api calls per 10 minutes per tab
 const max_queue=200, max_cache=500, max_scan_nodes=4000
 let enabled=false, strict=false, series=[], seen=new WeakMap()
