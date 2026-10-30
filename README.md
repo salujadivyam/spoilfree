@@ -1,5 +1,6 @@
 # SpoilFree
 
+https://bit.ly/spoilfree
 SpoilFree blurs spoilers for the shows and movies you follow, before you read them.
 
 You add the titles you watch and how far you have got. SpoilFree reads the page as you browse and blurs text that gives away more than you have seen. Click a blurred passage to read it. Click again to hide it.
